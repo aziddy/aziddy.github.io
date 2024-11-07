@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows Path/Filename Validator</title>
+
+    <!-- React and Babel dependencies -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            margin: 10px 0;
+            padding: 10px;
+        }
+
+        .valid {
+            color: green;
+        }
+
+        .invalid {
+            color: red;
+        }
+
+        .note{
+            color: rgb(99, 99, 99);
+        }
+
+        .tellYouText{
+            font-size: larger;
+        }
+
+        footer {
+            margin-top: 5rem;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #ccc;
+            padding-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        function PathValidator() {
+            const [paths, setPaths] = React.useState('');
+            const [validationResults, setValidationResults] = React.useState([]);
+            const validateWindowsPath = (path) => {
+                // Basic Windows path validation rules
+                const invalidChars = /[<>:"|?*]/;
+                const reservedNames = /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/i;
+
+                // Remove leading/trailing whitespace
+                path = path.trim();
+
+                if (path.length === 0) return false;
+                if (path.length > 260) return false; // Windows MAX_PATH limitation
+                if (invalidChars.test(path)) return false;
+
+                // Split path into segments
+                const segments = path.split('\\');
+
+                // Check each segment
+                for (const segment of segments) {
+                    if (segment.trim() === '') return false;
+                    if (reservedNames.test(segment)) return false;
+                    if (segment.endsWith('.') || segment.endsWith(' ')) return false;
+                    if (segment === '..') return false; // Disallow '..' as a directory component
+                }
+
+                return true;
+            };
+
+            const handlePathChange = (e) => {
+                const newPaths = e.target.value;
+                setPaths(newPaths);
+
+                // Validate each path
+                const results = newPaths
+                    .split('\n')
+                    .map(path => ({
+                        path: path.trim(),
+                        isValid: validateWindowsPath(path.trim())
+                    }));
+
+                setValidationResults(results);
+            };
+
+            const inputExample = () => {
+                const examples = "C:\\Users\\Documents\\file.txt\nD:\\Programs\\app.exe";
+                handlePathChange({ target: { value: examples } });
+            };
+
+            const removeDriveLetters = () => {
+                    const newPaths = paths.split('\n')
+                        .map(path => {
+                            // Remove drive letter pattern and optional backslash (e.g., "C:", "C:\", "D:", "D:\")
+                            return path.replace(/^[A-Za-z]:\\?/,'');
+                        })
+                        .join('\n');
+                    handlePathChange({ target: { value: newPaths } });
+            };
+            return (
+                <div className="container">
+                    <h1>Windows Path/Filename Validator</h1>
+                    <p className="note">Note: Windows has different path and filename constraints compared to MacOS/Linux systems. This validator checks Windows-specific rules.</p>
+                    <p className="tellYouText">Enter Windows file paths / filenames (one per line):</p>
+                    <textarea
+                        value={paths}
+                        onChange={handlePathChange}
+                        placeholder="Enter paths here...&#10;Example:&#10;C:\Users\Documents\file.txt&#10;D:\Programs\app.exe"
+                    />
+                    <button onClick={inputExample}>Input Example</button> <div></div>
+                    <button onClick={removeDriveLetters}>Remove Drive Letters</button>
+                    <div>
+                        <h2>Validation Results:</h2>
+                        {validationResults.map((result, index) => (
+                            <div key={index} className={result.isValid ? 'valid' : 'invalid'}>
+                                {result.path}: {result.isValid ? '✓ Valid' : '✗ Invalid'}
+                            </div>
+                        ))}
+                    </div>
+                    <footer>
+                        by Alex Zidros
+                    </footer>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<PathValidator />);
+    </script>
+</body>
+
+</html>
