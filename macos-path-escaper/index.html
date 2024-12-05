@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>macOS Path Escaper</title>
+
+    <!-- React and Babel dependencies -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin: 10px 0;
+            padding: 10px;
+            font-family: monospace;
+        }
+
+        .output {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+            word-wrap: break-word;
+        }
+
+        .note {
+            color: rgb(99, 99, 99);
+        }
+
+        .tellYouText {
+            font-size: larger;
+        }
+
+        button {
+            padding: 8px 16px;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        footer {
+            margin-top: 5rem;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #ccc;
+            padding-top: 1rem;
+        }
+
+        .copy-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .copy-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        function PathEscaper() {
+            const [inputPath, setInputPath] = React.useState('');
+            const [escapedPath, setEscapedPath] = React.useState('');
+
+            const escapePath = (path) => {
+                // Escape spaces and special characters
+                let escapedPath = path;
+                // Remove leading and trailing quotes if they exist
+                escapedPath = escapedPath.replace(/^['"]|['"]$/g, '');
+                escapedPath = escapedPath.replace(/([\s'"\[\]()!&;$*?|<>#])/g, '\\$1')
+                return escapedPath;
+            };
+
+            const handlePathChange = (e) => {
+                const newPath = e.target.value;
+                setInputPath(newPath);
+                setEscapedPath(escapePath(newPath));
+            };
+
+            const inputExample = () => {
+                const example = "/Users/username/Documents/My Project Folder/Important Files/document 1.pdf";
+                handlePathChange({ target: { value: example } });
+            };
+
+            const copyToClipboard = () => {
+                navigator.clipboard.writeText(`${escapedPath}`);
+            };
+
+            return (
+                <div className="container">
+                    <h1>macOS Path Escaper</h1>
+                    <p className="note">
+                        This tool helps you escape spaces and special characters in macOS paths 
+                        for use in the terminal with commands like 'cd'.
+                    </p>
+                    <p className="tellYouText">Enter your macOS path:</p>
+                    <textarea
+                        value={inputPath}
+                        onChange={handlePathChange}
+                        placeholder="Enter path here...&#10;Example: /Users/username/Documents/My Project Folder"
+                    />
+                    <button onClick={inputExample}>Show Example</button>
+                    
+                    {escapedPath && (
+                        <div>
+                            <h2>Escaped Path (ready for terminal):</h2>
+                            <div className="output">
+                                {escapedPath}
+                            </div>
+                            <button className="copy-button" onClick={copyToClipboard}>
+                                Copy to Clipboard
+                            </button>
+                        </div>
+                    )}
+
+                    <footer>
+                        by Alex Zidros
+                    </footer>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<PathEscaper />);
+    </script>
+</body>
+
+</html> 
