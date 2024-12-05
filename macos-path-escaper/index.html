@@ -74,6 +74,10 @@
 <body>
     <div id="root"></div>
 
+        <!-- Define External Components -->
+        <script type="text/babel" src="../generic_components/backButton.js"></script>
+        <!-- -------------------------- -->
+
     <script type="text/babel">
         function PathEscaper() {
             const [inputPath, setInputPath] = React.useState('');
@@ -99,13 +103,26 @@
                 handlePathChange({ target: { value: example } });
             };
 
+
+            function renderImages() {
+                return (
+                    <>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <img src="../media/MacOS_logo_%282017%29.svg" alt="MacOS Logo" width="75" height="75" style={{ verticalAlign: 'middle', marginLeft: '0px' }} />
+                        </div>
+                    </>
+                )
+            }
+
             const copyToClipboard = () => {
                 navigator.clipboard.writeText(`${escapedPath}`);
             };
 
             return (
                 <div className="container">
+                    <BackButton />
                     <h1>macOS Path Escaper</h1>
+                    {renderImages()}
                     <p className="note">
                         This tool helps you escape spaces and special characters in macOS paths 
                         for use in the terminal with commands like 'cd'.

@@ -55,6 +55,10 @@
 <body>
     <div id="root"></div>
 
+    <!-- Define External Components -->
+    <script type="text/babel" src="../generic_components/backButton.js"></script>
+    <!-- -------------------------- -->
+
     <script type="text/babel">
         function PathValidator() {
             const [paths, setPaths] = React.useState('');
@@ -105,6 +109,21 @@
                 handlePathChange({ target: { value: examples } });
             };
 
+            function renderImages(){
+                return(
+                    <>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <img src="../media/MacOS_logo_%282017%29.svg" alt="MacOS Logo" width="50" height="50" style={{ verticalAlign: 'middle', marginLeft: '8px' }} />
+                            <img src="../media/Tux.svg" alt="Linux Logo" width="50" height="50" style={{ verticalAlign: 'middle', marginLeft: '0px' }} />
+                            <svg width="50" height="50" viewBox="0 0 24 24" style={{ verticalAlign: 'middle' }}>
+                                <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z" fill="currentColor" />
+                            </svg>
+                            <img src="../media/Windows_logo_-_2012.svg" alt="Windows Logo" width="50" height="50" style={{ verticalAlign: 'middle', marginLeft: '8px' }} />
+                        </div>
+                    </>
+                )
+            }
+
             const removeDriveLetters = () => {
                     const newPaths = paths.split('\n')
                         .map(path => {
@@ -116,7 +135,9 @@
             };
             return (
                 <div className="container">
+                    <BackButton />
                     <h1>Windows Path/Filename Validator</h1>
+                    {renderImages()}
                     <p className="note">Note: Windows has different path and filename constraints compared to MacOS/Linux systems. This validator checks Windows-specific rules.</p>
                     <p className="tellYouText">Enter Windows file paths / filenames (one per line):</p>
                     <textarea
